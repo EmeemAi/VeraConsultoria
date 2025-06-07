@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chatbot Vera</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1b2a;
+      color: white;
+    }
+
+    section {
+      padding: 80px 20px 40px;
+      text-align: center;
+    }
+
+    p {
+      max-width: 600px;
+      margin: auto;
+      font-size: 1.2em;
+    }
+
+    #m-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #3ca6ff;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 22px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(60,166,255,0.3);
+      z-index: 9999;
+    }
+
+    #m-box {
+      display: none;
+      position: fixed;
+      bottom: 85px;
+      right: 20px;
+      width: 95vw;
+      max-width: 400px;
+      height: 550px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      flex-direction: column;
+      overflow: hidden;
+      animation: fade-in .3s ease;
+      z-index: 9999;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    #m-head {
+      background: #0d1b2a;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #m-head img {
+      height: 32px;
+      width: 32px;
+      border-radius: 50%;
+    }
+
+    #m-head-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    #m-c {
+      margin-left: auto;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    #m-msgs {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background: #f1f1f1;
+    }
+
+    .msg { display: flex; margin-bottom: 12px; gap: 8px; }
+    .msg.u { flex-direction: row-reverse; }
+    .mc {
+      padding: 10px 14px;
+      border-radius: 16px;
+      max-width: 75%;
+      line-height: 1.4;
+    }
+
+    .msg.b .mc { background: #e0e0e0; color: #333; }
+    .msg.u .mc { background: #3ca6ff; color: white; }
+
+    #m-i {
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      border-top: 1px solid #ccc;
+      background: white;
+    }
+
+    #m-in {
+      flex: 1;
+      padding: 8px 14px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    #m-s {
+      background: #3ca6ff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<section>
+  <img src="logo-vera.jpg" alt="Logo Vera" style="height: 140px; margin-bottom: 20px;">
+  <p>
+    Te damos la bienvenida a Vera, un espacio de acompañamiento psicológico.<br>
+    Consultá turnos o escribinos directamente desde el chat.
+  </p>
+</section>
+
+<button id="m-btn">💬 Agendá tu turno</button>
+
+<div id="m-box" style="display: none; flex-direction: column;">
+  <div id="m-head">
+    <img src="logo-vera.jpg" alt="Vera">
+    <div id="m-head-title">VeraBot</div>
+    <button id="m-c">×</button>
+  </div>
+  <div id="m-msgs">
+    <div class="msg b"><div class="mc">Hola, soy VeraBot. ¿En qué puedo ayudarte?</div></div>
+  </div>
+  <div id="m-i">
+    <input id="m-in" type="text" placeholder="Escribí tu mensaje..." />
+    <button id="m-s">➤</button>
+  </div>
+</div>
+
+<script>
+const webhook = "https://emeem.app.n8n.cloud/webhook/8f427031-1110-4ea3-aef7-5d06ba7d5bce/chat"; // actualizalo si Lucía tiene otro
+
+const btn = document.getElementById('m-btn');
+const box = document.getElementById('m-box');
+const close = document.getElementById('m-c');
+const msgs = document.getElementById('m-msgs');
+const input = document.getElementById('m-in');
+const send = document.getElementById('m-s');
+
+const addMessage = (text, user) => {
+  const msg = document.createElement('div');
+  msg.className = `msg ${user ? 'u' : 'b'}`;
+  const mc = document.createElement('div');
+  mc.className = 'mc';
+  mc.textContent = text;
+  msg.appendChild(mc);
+  msgs.appendChild(msg);
+  msgs.scrollTop = msgs.scrollHeight;
+};
+
+btn.onclick = () => { box.style.display = 'flex'; };
+close.onclick = () => { box.style.display = 'none'; };
+
+send.onclick = async () => {
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, true);
+  input.value = '';
+  send.disabled = true;
+
+  try {
+    const res = await fetch(webhook, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ chatInput: text, sessionId: 'vera', timestamp: new Date().toISOString() })
+    });
+    const data = await res.json();
+    let reply = 'Gracias por tu mensaje.';
+    if (Array.isArray(data) && data.length) reply = data[0]?.text || reply;
+    else if (data?.text || data?.reply || data?.message) reply = data.text || data.reply || data.message;
+    addMessage(reply, false);
+  } catch {
+    addMessage('❌ Hubo un problema de conexión.', false);
+  } finally {
+    send.disabled = false;
+  }
+};
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') send.click();
+});
+</script>
+
+</body>
+</html>
