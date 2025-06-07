@@ -189,7 +189,7 @@ const addMessage = (text, user) => {
   msg.className = `msg ${user ? 'u' : 'b'}`;
   const mc = document.createElement('div');
   mc.className = 'mc';
-  mc.textContent = text;
+  mc.innerHTML = text.replace(/\n/g, '<br>');
   msg.appendChild(mc);
   msgs.appendChild(msg);
   msgs.scrollTop = msgs.scrollHeight;
