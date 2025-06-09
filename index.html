@@ -105,12 +105,12 @@
 
     .msg { display: flex; margin-bottom: 12px; gap: 8px; }
     .msg.u { flex-direction: row-reverse; }
-.mc {
-  padding: 10px 14px;
-  border-radius: 16px;
-  max-width: 75%;
-  line-height: 1.4;
-  white-space: pre-line;
+    .mc {
+      padding: 10px 14px;
+      border-radius: 16px;
+      max-width: 75%;
+      line-height: 1.4;
+      white-space: pre-line;
     }
 
     .msg.b .mc { background: #e0e0e0; color: #333; }
@@ -173,10 +173,13 @@
     <input id="m-in" type="text" placeholder="Escribí tu mensaje..." />
     <button id="m-s">➤</button>
   </div>
+  <div style="text-align: center; font-size: 12px; color: #999; padding: 6px 0;">
+    powered by <a href="https://emeemai.github.io/bot/" target="_blank" style="color: #3ca6ff; text-decoration: none;"><strong>Emeem</strong></a>
+  </div>
 </div>
 
 <script>
-const webhook = "https://emeem.app.n8n.cloud/webhook/8f427031-1110-4ea3-aef7-5d06ba7d5bce/chat"; // actualizalo si Lucía tiene otro
+const webhook = "https://emeem.app.n8n.cloud/webhook/8f427031-1110-4ea3-aef7-5d06ba7d5bce/chat";
 
 const btn = document.getElementById('m-btn');
 const box = document.getElementById('m-box');
